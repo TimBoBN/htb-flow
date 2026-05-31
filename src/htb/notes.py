@@ -57,13 +57,13 @@ def parse(path: Path) -> dict:
         return m.group(1).strip() if m else ""
 
     return {
-        "ip":         find(r"\*\*IP:\*\*\s*`([^`]+)`"),
-        "os":         find(r"\*\*OS:\*\*\s*(.+)"),
+        "ip": find(r"\*\*IP:\*\*\s*`([^`]+)`"),
+        "os": find(r"\*\*OS:\*\*\s*(.+)"),
         "difficulty": find(r"\*\*Schwierigkeit:\*\*\s*(.+)"),
-        "points":     find(r"\*\*Punkte:\*\*\s*(.+)"),
-        "stars":      find(r"\*\*Rating:\*\*\s*★\s*(.+)"),
-        "user_flag":  find(r"\*\*User:\*\*\s*`([^`]+)`"),
-        "root_flag":  find(r"\*\*Root:\*\*\s*`([^`]+)`"),
+        "points": find(r"\*\*Punkte:\*\*\s*(.+)"),
+        "stars": find(r"\*\*Rating:\*\*\s*★\s*(.+)"),
+        "user_flag": find(r"\*\*User:\*\*\s*`([^`]+)`"),
+        "root_flag": find(r"\*\*Root:\*\*\s*`([^`]+)`"),
     }
 
 
@@ -89,7 +89,7 @@ def parse_creds(path: Path) -> list[dict]:
         context, user_raw, pass_raw = parts
         if not context or set(context) <= set("- ") or "Kontext" in context:
             continue
-        user     = re.sub(r"`([^`]*)`", r"\1", user_raw).strip()
+        user = re.sub(r"`([^`]*)`", r"\1", user_raw).strip()
         password = re.sub(r"`([^`]*)`", r"\1", pass_raw).strip()
         if user and password and user.lower() != "user":
             creds.append({"context": context, "user": user, "password": password})
@@ -102,7 +102,10 @@ def add_port(path: Path, port: str, service: str, version: str = ""):
     entry = f"| {port:<6} | {service:<8} | {version} |\n"
     section = "## Ports / Services"
     if section not in text:
-        path.write_text(text.rstrip() + f"\n\n{section}\n\n| Port   | Service  | Version |\n|--------|----------|---------|\n{entry}")
+        path.write_text(
+            text.rstrip()
+            + f"\n\n{section}\n\n| Port   | Service  | Version |\n|--------|----------|---------|\n{entry}"
+        )
         return
     lines = text.splitlines(keepends=True)
     last_row = None
@@ -141,9 +144,6 @@ def append_creds(path: Path, user: str, password: str, context: str = ""):
             return
 
     creds_section = (
-        f"\n{creds_header}\n\n"
-        f"| Kontext | User | Password |\n"
-        f"|---------|------|----------|\n"
-        f"{entry}"
+        f"\n{creds_header}\n\n| Kontext | User | Password |\n|---------|------|----------|\n{entry}"
     )
     path.write_text(text.rstrip() + "\n" + creds_section)

@@ -20,8 +20,8 @@ def start():
     if not HTB_OVPN.exists():
         die(f"HTB.ovpn nicht gefunden unter {HTB_OVPN}")
     subprocess.Popen(
-        ["sudo", "openvpn", "--config", str(HTB_OVPN), "--daemon", "--log", "/tmp/htb-vpn.log"]
-    )  # nosec B108
+        ["sudo", "openvpn", "--config", str(HTB_OVPN), "--daemon", "--log", "/tmp/htb-vpn.log"]  # nosec B108
+    )
     print("  Warte auf tun0", end="", flush=True)
     for _ in range(15):
         time.sleep(1)

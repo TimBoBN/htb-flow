@@ -25,9 +25,9 @@ _CFG = load_config()
 
 HTB_API_BASE = "https://labs.hackthebox.com/api/v4"
 HTB_KEY_FILE = Path.home() / ".config/htb/api_key"
-HTB_BASE     = _path("htb_base",  Path.home() / "Data/Cyber/HTB")
-HTB_OVPN     = _path("ovpn_path", Path.home() / "Data/Cyber/HTB.ovpn")
-EDITOR       = _CFG.get("editor", "")
-WL_DIR       = Path("/usr/share/wordlists")
-WL_WEB       = WL_DIR / "dirbuster/directory-list-2.3-medium.txt"
+HTB_BASE = _path("htb_base", Path.home() / "Data/Cyber/HTB")
+HTB_OVPN = _path("ovpn_path", Path.home() / "Data/Cyber/HTB.ovpn")
+EDITOR = _CFG.get("editor", "")
+WL_DIR = Path("/usr/share/wordlists")
+WL_WEB = WL_DIR / "dirbuster/directory-list-2.3-medium.txt"
 WL_WEB_SMALL = WL_DIR / "dirb/common.txt"
