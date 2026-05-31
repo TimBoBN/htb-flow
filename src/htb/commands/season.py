@@ -35,8 +35,7 @@ def run():
     console.print(f"  [bold]Subtitle:[/bold] {season.get('subtitle', '?')}")
     console.print(f"  [bold]Status:[/bold]   [{color}]{state}[/{color}]")
     console.print(
-        f"  [bold]Week:[/bold]     {season.get('current_week', '?')} / "
-        f"{season.get('weeks', '?')}"
+        f"  [bold]Week:[/bold]     {season.get('current_week', '?')} / {season.get('weeks', '?')}"
     )
     console.print(f"  [bold]Players:[/bold]  {season.get('players', '?')}")
 
