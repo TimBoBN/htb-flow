@@ -11,10 +11,10 @@ A command-line workflow tool for HackTheBox. Manage the full machine lifecycle f
 **Requirements:** Python 3.11+, `nmap`
 
 ```bash
-# Empfohlen (isolierte Umgebung)
+# Recommended (isolated environment)
 pipx install htb-flow
 
-# Alternativ
+# Alternative
 pip install htb-flow
 ```
 
