@@ -136,6 +136,42 @@ def search_machines(key: str, query: str) -> list[dict]:
     return results
 
 
+def get_user_id(key: str) -> int | None:
+    try:
+        r = requests.get(f"{HTB_API_BASE}/user/info",
+                         headers=_headers(key), timeout=8)
+        r.raise_for_status()
+        return r.json().get("info", {}).get("id")
+    except Exception:
+        return None
+
+
+def get_profile(key: str) -> dict:
+    uid = get_user_id(key)
+    if not uid:
+        return {}
+    try:
+        r = requests.get(f"{HTB_API_BASE}/profile/{uid}",
+                         headers=_headers(key), timeout=8)
+        r.raise_for_status()
+        return r.json().get("profile") or {}
+    except Exception:
+        return {}
+
+
+def get_activity(key: str) -> list[dict]:
+    uid = get_user_id(key)
+    if not uid:
+        return []
+    try:
+        r = requests.get(f"{HTB_API_BASE}/user/profile/activity/{uid}",
+                         headers=_headers(key), timeout=8)
+        r.raise_for_status()
+        return r.json().get("profile", {}).get("activity") or []
+    except Exception:
+        return []
+
+
 def terminate_machine(key: str) -> str | None:
     try:
         r = requests.post(

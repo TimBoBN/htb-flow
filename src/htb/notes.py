@@ -71,6 +71,54 @@ def create(path: Path, **kwargs):
     path.write_text(TEMPLATE.format(**kwargs))
 
 
+def parse_creds(path: Path) -> list[dict]:
+    """Parse the Credentials table from notes.md."""
+    text = path.read_text()
+    creds, in_section = [], False
+    for line in text.splitlines():
+        if "## Credentials" in line:
+            in_section = True
+            continue
+        if in_section and line.startswith("## "):
+            break
+        if not (in_section and line.strip().startswith("|")):
+            continue
+        parts = [p.strip() for p in line.split("|")[1:-1]]
+        if len(parts) != 3:
+            continue
+        context, user_raw, pass_raw = parts
+        if not context or set(context) <= set("- ") or "Kontext" in context:
+            continue
+        user     = re.sub(r"`([^`]*)`", r"\1", user_raw).strip()
+        password = re.sub(r"`([^`]*)`", r"\1", pass_raw).strip()
+        if user and password and user.lower() != "user":
+            creds.append({"context": context, "user": user, "password": password})
+    return creds
+
+
+def add_port(path: Path, port: str, service: str, version: str = ""):
+    """Append a row to the Ports / Services table in notes.md."""
+    text = path.read_text()
+    entry = f"| {port:<6} | {service:<8} | {version} |\n"
+    section = "## Ports / Services"
+    if section not in text:
+        path.write_text(text.rstrip() + f"\n\n{section}\n\n| Port   | Service  | Version |\n|--------|----------|---------|\n{entry}")
+        return
+    lines = text.splitlines(keepends=True)
+    last_row = None
+    in_sec = False
+    for i, line in enumerate(lines):
+        if section in line:
+            in_sec = True
+        elif in_sec and line.startswith("## "):
+            break
+        elif in_sec and line.strip().startswith("|"):
+            last_row = i
+    if last_row is not None:
+        lines.insert(last_row + 1, entry)
+        path.write_text("".join(lines))
+
+
 def append_creds(path: Path, user: str, password: str, context: str = ""):
     text = path.read_text()
     entry = f"| {context or '-'} | `{user}` | `{password}` |\n"

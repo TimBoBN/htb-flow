@@ -5,9 +5,11 @@ from .api import load_machine_profile
 from .ui import console, die
 from . import __version__
 
-GLOBAL_CMDS  = {"status", "list", "search", "completion", "key"}
+GLOBAL_CMDS  = {"status", "list", "search", "completion", "key",
+                "todo", "profile", "activity"}
 MACHINE_CMDS = {"init", "done", "update", "info", "notes",
-                "flag", "scan", "creds", "spawn", "reset"}
+                "flag", "scan", "creds", "spawn", "reset",
+                "shell", "port", "writeup"}
 ALL_CMDS = GLOBAL_CMDS | MACHINE_CMDS
 
 
@@ -33,9 +35,17 @@ def usage(exit_code: int = 1):
     console.print("  htb flag   <machine>               Flag einreichen")
     console.print("  htb scan   <machine> \\[ip] \\[--full]  Nmap erneut ausführen")
     console.print("  htb creds  <machine>               Credentials speichern")
+    console.print("  htb shell  <machine>               Shell mit Creds aus notes.md")
+    console.print("  htb port   <machine> <port> <svc>  Port zur notes.md hinzufügen")
+    console.print("  htb writeup <machine>              Sauberes Writeup exportieren")
     console.print("")
     console.print("[bold]Shell:[/bold]")
     console.print("  htb completion bash|zsh            Shell-Completion ausgeben")
+    console.print("")
+    console.print("[bold]Profil:[/bold]")
+    console.print("  htb profile                        Eigenes Profil anzeigen")
+    console.print("  htb activity                       Letzte Aktivität")
+    console.print("  htb todo                           Laufende Boxen mit Flag-Status")
     console.print("")
     console.print("[bold]Auth:[/bold]")
     console.print("  htb key set                        API Key im Keyring speichern")
@@ -89,6 +99,19 @@ def main():
         subcmd = rest[0] if rest else "status"
         from .commands import key_cmd
         key_cmd.run(subcmd)
+
+    elif mode == "todo":
+        from .commands import todo
+        todo.run()
+
+    elif mode == "profile":
+        from .commands import profile
+        profile.run()
+
+    elif mode == "activity":
+        limit = int(rest[0]) if rest and rest[0].isdigit() else 20
+        from .commands import activity
+        activity.run(limit)
 
     # ── Machine Commands ───────────────────────────────────────────────────────
     else:
@@ -162,6 +185,23 @@ def main():
         elif mode == "reset":
             from .commands import reset
             reset.run(machine)
+
+        elif mode == "shell":
+            from .commands import shell
+            shell.run(machine)
+
+        elif mode == "port":
+            if len(extra) < 2:
+                die("Usage: htb port <machine> <port> <service> [version]")
+            port_num = extra[0]
+            service  = extra[1]
+            version  = extra[2] if len(extra) > 2 else ""
+            from .commands import port
+            port.run(machine, port_num, service, version)
+
+        elif mode == "writeup":
+            from .commands import writeup
+            writeup.run(machine)
 
 
 if __name__ == "__main__":

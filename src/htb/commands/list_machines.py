@@ -1,6 +1,7 @@
 from rich.table import Table
 
 from ..api import get_api_key, list_machines
+from ..config import HTB_BASE
 from ..ui import console, header, warn, die
 
 
@@ -20,18 +21,24 @@ def _machine_table(machines: list[dict]) -> Table:
     table.add_column("Punkte",        justify="right", min_width=6)
     table.add_column("Rating",        min_width=6)
     table.add_column("Release",       min_width=10)
+    table.add_column("Lokal",         justify="center", min_width=5)
+
+    local_names = {d.name.lower() for d in HTB_BASE.iterdir() if d.is_dir()} if HTB_BASE.exists() else set()
 
     for m in machines:
-        diff = m.get("difficultyText") or m.get("difficulty") or "?"
+        diff  = m.get("difficultyText") or m.get("difficulty") or "?"
         color = _DIFF_COLORS.get(diff.lower(), "white")
-        pts = m.get("static_points") or m.get("points") or "?"
+        pts   = m.get("static_points") or m.get("points") or "?"
+        name  = m.get("name", "?")
+        local = "[green]●[/green]" if name.lower() in local_names else ""
         table.add_row(
-            m.get("name", "?"),
+            name,
             m.get("os", "?"),
             f"[{color}]{diff}[/{color}]",
             str(pts),
             f"★ {m.get('star') or m.get('stars', '?')}",
             (m.get("release") or "?")[:10],
+            local,
         )
     return table
 
