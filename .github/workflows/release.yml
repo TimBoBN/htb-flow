@@ -17,11 +17,26 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          fetch-depth: 0   # full history for changelog
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
+
+      - name: Bump version from tag
+        run: |
+          VERSION=${GITHUB_REF_NAME#v}
+          sed -i "s/^version = .*/version = \"$VERSION\"/" pyproject.toml
+          sed -i "s/__version__ = .*/__version__ = \"$VERSION\"/" src/htb/__init__.py
+          if git diff --quiet; then
+            echo "Version already up to date"
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add pyproject.toml src/htb/__init__.py
+            git commit -m "chore: bump version to $VERSION [skip ci]"
+            git push origin HEAD:main
+          fi
 
       - name: Install build tools
         run: pip install build
@@ -36,7 +51,8 @@ jobs:
           files: dist/*
 
       # Requires PyPI Trusted Publishing configured at:
-      # https://pypi.org/manage/project/htb-cli/settings/publishing/
+      # https://pypi.org/manage/project/htb-flow/settings/publishing/
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        continue-on-error: true
+        with:
+          skip-existing: true
