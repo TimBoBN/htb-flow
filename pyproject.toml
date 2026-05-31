@@ -4,7 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "htb-flow"
-version = "0.1.0"
+version = "0.1.3"
+description = "A command-line workflow tool for HackTheBox — manage the full machine lifecycle without leaving the terminal."
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["hackthebox", "htb", "ctf", "security", "pentesting"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Security",
+]
 requires-python = ">=3.11"
 dependencies = [
     "requests",

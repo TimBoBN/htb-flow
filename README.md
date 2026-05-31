@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/TimBoBN/htb-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/TimBoBN/htb-flow/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/TimBoBN/htb-flow/branch/main/graph/badge.svg)](https://codecov.io/gh/TimBoBN/htb-flow)
+[![PyPI](https://img.shields.io/pypi/v/htb-flow)](https://pypi.org/project/htb-flow/)
 
 A command-line workflow tool for HackTheBox. Manage the full machine lifecycle from initial setup to completion: spawn machines, run recon, track credentials, submit flags, and archive finished boxes — all without leaving the terminal.
 
@@ -10,8 +11,14 @@ A command-line workflow tool for HackTheBox. Manage the full machine lifecycle f
 **Requirements:** Python 3.11+, `pipx`, `nmap`
 
 ```bash
-git clone https://github.com/timbobn/htb-flow
-cd htbflow
+pipx install htb-flow
+```
+
+Or from source:
+
+```bash
+git clone https://github.com/TimBoBN/htb-flow
+cd htb-flow
 pipx install .
 ```
 
@@ -26,37 +33,58 @@ htb key set
 ### Workflow
 
 ```bash
-htb init  <machine> [ip]   # Setup: VPN check, folders, /etc/hosts, notes.md, nmap
-htb done  <machine>        # Finish: submit flags, terminate, cleanup, archive
-htb update <machine> [ip]  # Update IP in /etc/hosts and notes.md
+htb init   <machine> [ip]   # Setup: VPN check, folders, /etc/hosts, notes.md, nmap
+htb done   <machine>        # Finish: submit flags, terminate, cleanup, archive
+htb update <machine> [ip]   # Update IP in /etc/hosts and notes.md
 ```
 
 ### Recon
 
 ```bash
-htb list                          # All active machines
-htb list --retired                # Retired machines
-htb list --os Linux --diff Easy   # With filters (os/diff)
-htb search <query>                # Search by name
-htb info  <machine>               # Machine details + local status
-htb status                        # Currently active machine + time remaining
+htb list                           # All active machines
+htb list --retired                 # Retired machines
+htb list --os Linux --diff Easy    # With filters
+htb list --search <query>          # Search within list
+htb search <query>                 # Search across all machines
+htb info   <machine>               # Machine details + local status
+htb status                         # Currently active machine + time remaining
+```
+
+### Profile & Stats
+
+```bash
+htb profile          # Your profile (rank, points, owns)
+htb activity [n]     # Last n solves (default 20)
+htb timeline         # Solve history as ASCII chart
+htb tracks           # Learning paths
+htb fortresses       # Fortresses
+htb todo             # Local machines with flag status
 ```
 
 ### Lifecycle
 
 ```bash
-htb spawn <machine>   # Start a machine via API, waits for IP
-htb reset <machine>   # Reset a running machine
+htb spawn  <machine>   # Start a machine via API, waits for IP
+htb reset  <machine>   # Reset a running machine
+htb vpn    status      # VPN status
+htb vpn    start       # Start VPN
+htb vpn    stop        # Stop VPN
+htb vpn    switch      # Switch VPN profile
 ```
 
 ### Quick actions
 
 ```bash
-htb notes <machine>              # Open notes.md in $EDITOR
-htb flag  <machine>              # Submit a flag without running done
-htb scan  <machine> [ip]         # Re-run nmap quick scan
-htb scan  <machine> [ip] --full  # Re-run full port scan (background)
-htb creds <machine>              # Save found credentials to notes.md
+htb notes   <machine>              # Open notes.md in $EDITOR
+htb flag    <machine>              # Submit a flag without running done
+htb scan    <machine> [ip]         # Re-run nmap quick scan
+htb scan    <machine> [ip] --full  # Re-run full port scan (background)
+htb creds   <machine>              # Save found credentials to notes.md
+htb shell   <machine>              # SSH/evil-winrm with creds from notes.md
+htb port    <machine> <port> <svc> # Add port to notes.md table
+htb writeup <machine>              # Export clean writeup
+htb open    <machine>              # Open machine page in browser
+htb diff    <machine>              # Git diff of notes.md
 ```
 
 ### Auth
