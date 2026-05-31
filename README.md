@@ -1,4 +1,4 @@
-# htbflow
+# htb-flow
 
 [![CI](https://github.com/TimBoBN/htb-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/TimBoBN/htb-flow/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/TimBoBN/htb-flow/branch/main/graph/badge.svg)](https://codecov.io/gh/TimBoBN/htb-flow)
