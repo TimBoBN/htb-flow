@@ -28,9 +28,10 @@ def run(machine: str):
         time.sleep(1)
         print(".", end="", flush=True)
         active = get_active_machine(key)
-        if active.get("ip"):
+        ip_addr = active.get("ip")
+        if ip_addr:
             print()
-            ok(f"Machine active: [cyan]{active["ip"]}[/cyan]")
+            ok(f"Machine active: [cyan]{ip_addr}[/cyan]")
             ok(f"Hostname: {machine.lower()}.htb")
             return
     print()
