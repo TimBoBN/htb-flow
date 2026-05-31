@@ -6,10 +6,10 @@ from ..ui import console, header, ok, warn
 
 
 def run():
-    header("To-Do — Laufende Boxen")
+    header("To-Do — Local Boxes")
 
     if not HTB_BASE.exists():
-        warn(f"HTB_BASE nicht gefunden: {HTB_BASE}")
+        warn(f"HTB_BASE not found: {HTB_BASE}")
         return
 
     machines = []
@@ -32,7 +32,7 @@ def run():
         )
 
     if not machines:
-        ok("Keine laufenden Boxen gefunden")
+        ok("No local boxes found")
         return
 
     diff_colors = {"Easy": "green", "Medium": "yellow", "Hard": "red", "Insane": "magenta"}
@@ -40,7 +40,7 @@ def run():
     table = Table(show_header=True, header_style="bold cyan", border_style="dim")
     table.add_column("Name", style="bold", min_width=12)
     table.add_column("OS", min_width=8)
-    table.add_column("Schwierigkeit", min_width=10)
+    table.add_column("Difficulty", min_width=10)
     table.add_column("IP", min_width=14)
     table.add_column("User", justify="center", min_width=6)
     table.add_column("Root", justify="center", min_width=6)
@@ -57,6 +57,6 @@ def run():
             "[green]✔[/green]" if m["root"] else "[red]✘[/red]",
         )
 
-    console.print(f"  {len(machines)} Box(en)\n")
+    console.print(f"  {len(machines)} box(es)\n")
     console.print(table)
     print()

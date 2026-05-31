@@ -10,7 +10,7 @@ def run(machine: str):
     notes_path = box_dir / "notes.md"
 
     if not notes_path.exists():
-        die(f"notes.md nicht gefunden: {notes_path}")
+        die(f"notes.md not found: {notes_path}")
 
     header(f"Diff: {machine}")
 
@@ -20,10 +20,10 @@ def run(machine: str):
         capture_output=True,
     )
     if git_check.returncode != 0:
-        warn("Kein Git-Repository in HTB_BASE")
+        warn("No git repository in HTB_BASE")
         mtime = notes_path.stat().st_mtime
         dt = datetime.datetime.fromtimestamp(mtime)
-        console.print(f"  Zuletzt geändert: {dt.strftime('%d.%m.%Y %H:%M')}")
+        console.print(f"  Last modified: {dt.strftime('%Y-%m-%d %H:%M')}")
         print()
         return
 
@@ -35,7 +35,7 @@ def run(machine: str):
     )
 
     if not result.stdout.strip():
-        ok("Keine Änderungen seit letztem Commit")
+        ok("No changes since last commit")
         print()
         return
 

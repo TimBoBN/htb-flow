@@ -9,12 +9,12 @@ BAR_WIDTH = 28
 def run():
     key = get_api_key()
     if not key:
-        die("Kein API-Key — htb key set")
+        die("No API key — run: htb key set")
 
-    header("Solve-Timeline")
+    header("Solve Timeline")
     acts = get_activity(key)
     if not acts:
-        warn("Keine Aktivität gefunden")
+        warn("No activity found")
         return
 
     by_month: dict[str, int] = defaultdict(int)
@@ -24,7 +24,7 @@ def run():
             by_month[month] += 1
 
     if not by_month:
-        warn("Keine Daten")
+        warn("No data")
         return
 
     max_count = max(by_month.values())
@@ -36,5 +36,5 @@ def run():
         bar = "█" * bar_len
         console.print(f"  {month}  [cyan]{bar:<{BAR_WIDTH}}[/cyan]  {count:>3}")
 
-    console.print(f"\n  [dim]Gesamt: {total} Solves in {len(by_month)} Monaten[/dim]")
+    console.print(f"\n  [dim]Total: {total} solves across {len(by_month)} months[/dim]")
     print()

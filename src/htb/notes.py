@@ -6,10 +6,10 @@ TEMPLATE = """\
 
 - **IP:** `{ip}`
 - **Hostname:** `{hostname}`
-- **Datum:** {date}
+- **Date:** {date}
 - **OS:** {os}
-- **Schwierigkeit:** {difficulty}
-- **Punkte:** {points}
+- **Difficulty:** {difficulty}
+- **Points:** {points}
 - **Release:** {release}
 - **Rating:** ★ {stars}
 
@@ -40,11 +40,11 @@ TEMPLATE = """\
 
 ## Credentials
 
-| Kontext | User | Password |
+| Context | User | Password |
 |---------|------|----------|
 |         |      |          |
 
-## Notizen
+## Notes
 
 """
 
@@ -59,8 +59,8 @@ def parse(path: Path) -> dict:
     return {
         "ip": find(r"\*\*IP:\*\*\s*`([^`]+)`"),
         "os": find(r"\*\*OS:\*\*\s*(.+)"),
-        "difficulty": find(r"\*\*Schwierigkeit:\*\*\s*(.+)"),
-        "points": find(r"\*\*Punkte:\*\*\s*(.+)"),
+        "difficulty": find(r"\*\*(?:Difficulty|Schwierigkeit):\*\*\s*(.+)"),
+        "points": find(r"\*\*(?:Points|Punkte):\*\*\s*(.+)"),
         "stars": find(r"\*\*Rating:\*\*\s*★\s*(.+)"),
         "user_flag": find(r"\*\*User:\*\*\s*`([^`]+)`"),
         "root_flag": find(r"\*\*Root:\*\*\s*`([^`]+)`"),
@@ -71,8 +71,18 @@ def create(path: Path, **kwargs):
     path.write_text(TEMPLATE.format(**kwargs))
 
 
+def append_note(path: Path, text: str):
+    from datetime import datetime
+
+    entry = f"\n**{datetime.now().strftime('%Y-%m-%d %H:%M')}** — {text}\n"
+    content = path.read_text()
+    if "## Notes" in content or "## Notizen" in content:
+        path.write_text(content.rstrip() + "\n" + entry)
+    else:
+        path.write_text(content.rstrip() + f"\n\n## Notes\n{entry}")
+
+
 def parse_creds(path: Path) -> list[dict]:
-    """Parse the Credentials table from notes.md."""
     text = path.read_text()
     creds, in_section = [], False
     for line in text.splitlines():
@@ -87,17 +97,16 @@ def parse_creds(path: Path) -> list[dict]:
         if len(parts) != 3:
             continue
         context, user_raw, pass_raw = parts
-        if not context or set(context) <= set("- ") or "Kontext" in context:
+        if not context or set(context) <= set("- ") or context in ("Context", "Kontext"):
             continue
         user = re.sub(r"`([^`]*)`", r"\1", user_raw).strip()
         password = re.sub(r"`([^`]*)`", r"\1", pass_raw).strip()
-        if user and password and user.lower() != "user":
+        if user and password and user.lower() not in ("user", ""):
             creds.append({"context": context, "user": user, "password": password})
     return creds
 
 
 def add_port(path: Path, port: str, service: str, version: str = ""):
-    """Append a row to the Ports / Services table in notes.md."""
     text = path.read_text()
     entry = f"| {port:<6} | {service:<8} | {version} |\n"
     section = "## Ports / Services"
@@ -144,6 +153,6 @@ def append_creds(path: Path, user: str, password: str, context: str = ""):
             return
 
     creds_section = (
-        f"\n{creds_header}\n\n| Kontext | User | Password |\n|---------|------|----------|\n{entry}"
+        f"\n{creds_header}\n\n| Context | User | Password |\n|---------|------|----------|\n{entry}"
     )
     path.write_text(text.rstrip() + "\n" + creds_section)

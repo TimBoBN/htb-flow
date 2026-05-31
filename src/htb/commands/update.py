@@ -12,25 +12,25 @@ def run(machine: str, ip: str):
     notes = box_dir / "notes.md"
 
     if not box_dir.exists():
-        die(f"Maschine '{machine}' nicht gefunden unter {box_dir}")
+        die(f"Machine '{machine}' not found at {box_dir}")
 
     console.print(BANNER_HTB)
     console.print(f"  [bold]Machine:[/bold]  {machine}")
     console.print(f"  [bold]IP:[/bold]       {ip}")
-    console.print("  [bold]Modus:[/bold]    [yellow]IP-Update[/yellow]")
-    console.print(f"  [bold]Zeit:[/bold]     {date.today().strftime('%d.%m.%Y')}\n")
+    console.print("  [bold]Mode:[/bold]     [yellow]IP Update[/yellow]")
+    console.print(f"  [bold]Date:[/bold]     {date.today().strftime('%Y-%m-%d')}\n")
 
     header("/etc/hosts")
     if hosts.contains(hostname):
         old_ip = hosts.get_ip(hostname) or ""
         if old_ip == ip:
-            ok(f"IP ist bereits {ip} — nichts zu tun")
+            ok(f"IP is already {ip} — nothing to do")
         else:
             hosts.update_ip(old_ip, ip, hostname)
-            ok(f"IP aktualisiert: {old_ip}  →  {ip}")
+            ok(f"IP updated: {old_ip}  →  {ip}")
     else:
         hosts.add(ip, hostname)
-        ok(f"Neu eingetragen: {ip}  →  {hostname}")
+        ok(f"Added: {ip}  →  {hostname}")
 
     header("notes.md")
     if notes.exists():
@@ -38,13 +38,13 @@ def run(machine: str, ip: str):
         old_ips = re.findall(r"`(\d+\.\d+\.\d+\.\d+)`", text)
         if old_ips and old_ips[0] != ip:
             notes.write_text(text.replace(old_ips[0], ip))
-            ok(f"IP in notes.md aktualisiert: {old_ips[0]}  →  {ip}")
+            ok(f"IP updated in notes.md: {old_ips[0]}  →  {ip}")
         else:
-            ok("notes.md bereits aktuell")
+            ok("notes.md already up to date")
 
     console.print("\n[bold cyan]══════════════════════════════════[/bold cyan]")
-    console.print("[bold]  Update abgeschlossen[/bold]")
+    console.print("[bold]  Update complete[/bold]")
     console.print("[bold cyan]══════════════════════════════════[/bold cyan]")
-    console.print(f"  [bold]Maschine:[/bold]  {machine}")
-    console.print(f"  [bold]Neue IP:[/bold]   {ip}")
-    console.print(f"  [bold]Hostname:[/bold]  {hostname}\n")
+    console.print(f"  [bold]Machine:[/bold]  {machine}")
+    console.print(f"  [bold]New IP:[/bold]   {ip}")
+    console.print(f"  [bold]Hostname:[/bold] {hostname}\n")

@@ -5,22 +5,22 @@ from ..ui import ask, ask_input, console, ok, warn
 
 
 def submit_one(key: str, machine_id: int, label: str, flag: str) -> bool:
-    """Interaktive Flag-Submission. Gibt True zurück wenn erfolgreich."""
+    """Interactive flag submission. Returns True on success."""
     if not flag:
-        warn(f"{label}: kein Flag in notes.md gefunden")
+        warn(f"{label}: no flag found in notes.md")
         return False
     console.print(f"  [bold]{label} Flag:[/bold] {flag}")
-    if ask(f"{label} Flag jetzt einreichen?"):
-        diff_str = ask_input("Schwierigkeit (1-10):")
+    if ask(f"Submit {label} flag now?"):
+        diff_str = ask_input("Difficulty (1-10):")
         if not re.fullmatch(r"([1-9]|10)", diff_str):
-            warn("Ungültige Eingabe, übersprungen")
+            warn("Invalid input, skipped")
             return False
         result = submit_flag(key, machine_id, flag, int(diff_str))
         if result and re.search(r"correct|own|congrat|pwned", result, re.IGNORECASE):
-            ok(f"Eingereicht: {result}")
+            ok(f"Submitted: {result}")
             return True
         elif result:
-            warn(f"Antwort: {result}")
+            warn(f"Response: {result}")
         else:
-            warn("Keine Antwort von der API")
+            warn("No response from API")
     return False

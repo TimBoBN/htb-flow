@@ -33,12 +33,12 @@ def _clean(text: str) -> str:
 def run(machine: str):
     notes_path = HTB_BASE / machine / "notes.md"
     if not notes_path.exists():
-        die(f"notes.md nicht gefunden: {notes_path}")
+        die(f"notes.md not found: {notes_path}")
 
     header(f"Writeup: {machine}")
     out_path = HTB_BASE / machine / f"{machine}-writeup.md"
     cleaned = _clean(notes_path.read_text())
     out_path.write_text(cleaned)
-    ok(f"Erstellt: {out_path}")
+    ok(f"Created: {out_path}")
     console.print(f"\n  [cyan]{out_path}[/cyan]")
     print()

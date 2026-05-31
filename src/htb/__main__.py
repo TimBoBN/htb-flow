@@ -19,6 +19,11 @@ GLOBAL_CMDS = {
     "tracks",
     "fortresses",
     "vpn",
+    "stats",
+    "season",
+    "export",
+    "doctor",
+    "config",
 }
 MACHINE_CMDS = {
     "init",
@@ -36,6 +41,7 @@ MACHINE_CMDS = {
     "writeup",
     "open",
     "diff",
+    "note",
 }
 ALL_CMDS = GLOBAL_CMDS | MACHINE_CMDS
 
@@ -43,47 +49,53 @@ ALL_CMDS = GLOBAL_CMDS | MACHINE_CMDS
 def usage(exit_code: int = 1):
     console.print(f"[bold]htb[/bold] v{__version__} — HackTheBox Workflow Helper\n")
     console.print("[bold]Workflow:[/bold]")
-    console.print("  htb init   <machine> \\[ip]        Setup: VPN, Ordner, hosts, notes, nmap")
-    console.print("  htb done   <machine>               Abschluss: flags, terminieren, archivieren")
-    console.print("  htb update <machine> \\[ip]        IP aktualisieren")
+    console.print("  htb init   <machine> \\[ip]         Setup: VPN, folders, hosts, notes, nmap")
+    console.print("  htb done   <machine>                Finish: submit flags, terminate, archive")
+    console.print("  htb update <machine> \\[ip]         Update IP in hosts + notes")
     console.print("")
-    console.print("[bold]Recherche:[/bold]")
-    console.print("  htb status                         Aktive Maschine anzeigen")
-    console.print("  htb list   \\[--retired] \\[--os OS] \\[--diff DIFF]  Maschinen listen")
-    console.print("  htb search <query>                 Maschinen suchen")
-    console.print("  htb info   <machine>               Maschineninfo")
+    console.print("[bold]Recon:[/bold]")
+    console.print("  htb status                          Active machine + time remaining")
+    console.print("  htb list   \\[--retired] \\[--os OS] \\[--diff DIFF] \\[--search Q]")
+    console.print("  htb search <query>                  Search all machines")
+    console.print("  htb info   <machine>                Machine details + local status")
     console.print("")
     console.print("[bold]Lifecycle:[/bold]")
-    console.print("  htb spawn  <machine>               Maschine starten")
-    console.print("  htb reset  <machine>               Maschine resetten")
+    console.print("  htb spawn  <machine>                Start machine via API, waits for IP")
+    console.print("  htb reset  <machine>                Reset a running machine")
+    console.print("  htb vpn    status|start|stop|switch VPN management")
     console.print("")
-    console.print("[bold]Schnellaktionen:[/bold]")
-    console.print("  htb notes  <machine>               notes.md im Editor öffnen")
-    console.print("  htb flag   <machine>               Flag einreichen")
-    console.print("  htb scan   <machine> \\[ip] \\[--full]  Nmap erneut ausführen")
-    console.print("  htb creds   <machine>              Credentials speichern")
-    console.print("  htb shell   <machine>              Shell mit Creds aus notes.md")
-    console.print("  htb port    <machine> <port> <svc> Port zur notes.md hinzufügen")
-    console.print("  htb writeup <machine>              Sauberes Writeup exportieren")
-    console.print("  htb open    <machine>              Im Browser öffnen")
-    console.print("  htb diff    <machine>              notes.md git diff")
+    console.print("[bold]Quick actions:[/bold]")
+    console.print("  htb notes   <machine>               Open notes.md in \\$EDITOR")
+    console.print("  htb note    <machine> <text>        Append timestamped note")
+    console.print("  htb flag    <machine>               Submit a flag")
+    console.print("  htb scan    <machine> \\[ip] \\[--full] \\[--ports PORTS]")
+    console.print("  htb creds   <machine>               Save credentials to notes.md")
+    console.print("  htb shell   <machine>               SSH/evil-winrm with creds from notes.md")
+    console.print("  htb port    <machine> <port> <svc>  Add port to notes.md")
+    console.print("  htb writeup <machine>               Export clean writeup")
+    console.print("  htb open    <machine>               Open machine page in browser")
+    console.print("  htb diff    <machine>               Git diff of notes.md")
     console.print("")
-    console.print("[bold]Shell:[/bold]")
-    console.print("  htb completion bash|zsh            Shell-Completion ausgeben")
+    console.print("[bold]Profile & Stats:[/bold]")
+    console.print("  htb profile                         Your profile (rank, points, owns)")
+    console.print("  htb activity \\[n]                   Last n solves (default 20)")
+    console.print("  htb timeline                        Solve history as ASCII chart")
+    console.print("  htb stats                           Personal statistics + OS distribution")
+    console.print("  htb season                          Current season info")
+    console.print("  htb todo                            Local machines with flag status")
+    console.print("  htb tracks                          Learning paths")
+    console.print("  htb fortresses                      Fortresses")
     console.print("")
-    console.print("[bold]Profil & Stats:[/bold]")
-    console.print("  htb profile                        Eigenes Profil anzeigen")
-    console.print("  htb activity \\[n]                  Letzte n Aktivitäten (default 20)")
-    console.print("  htb todo                           Laufende Boxen mit Flag-Status")
-    console.print("  htb timeline                       Solve-History als Chart")
-    console.print("  htb tracks                         Lernpfade anzeigen")
-    console.print("  htb fortresses                     Fortresses anzeigen")
-    console.print("  htb vpn [status|start|stop|switch] VPN verwalten")
+    console.print("[bold]Tools:[/bold]")
+    console.print("  htb export \\[--notes-only]          Export all machines as ZIP")
+    console.print("  htb doctor                          Check all dependencies")
+    console.print("  htb config                          Interactive config setup")
+    console.print("  htb completion bash|zsh             Shell completion script")
     console.print("")
     console.print("[bold]Auth:[/bold]")
-    console.print("  htb key set                        API Key im Keyring speichern")
-    console.print("  htb key clear                      API Key löschen")
-    console.print("  htb key status                     Key-Status anzeigen")
+    console.print("  htb key set                         Store API key in system keyring")
+    console.print("  htb key status                      Show key source")
+    console.print("  htb key clear                       Remove key from keyring")
     console.print("")
     console.print("  [cyan]Alias:[/cyan]  htb -u <machine> \\[ip]  →  htb update")
     sys.exit(exit_code)
@@ -193,6 +205,32 @@ def main():
 
         vpn_cmd.run(subcmd)
 
+    elif mode == "stats":
+        from .commands import stats
+
+        stats.run()
+
+    elif mode == "season":
+        from .commands import season
+
+        season.run()
+
+    elif mode == "export":
+        notes_only = "--notes-only" in rest
+        from .commands import export
+
+        export.run(notes_only=notes_only)
+
+    elif mode == "doctor":
+        from .commands import doctor
+
+        doctor.run()
+
+    elif mode == "config":
+        from .commands import config_setup
+
+        config_setup.run()
+
     # ── Machine Commands ───────────────────────────────────────────────────────
     else:
         if not rest:
@@ -203,7 +241,7 @@ def main():
         if mode == "init":
             ip = next((a for a in extra if not a.startswith("--")), "")
             if ip and not re.fullmatch(r"(\d{1,3}\.){3}\d{1,3}", ip):
-                die(f"Ungültige IP-Adresse: {ip}")
+                die(f"Invalid IP address: {ip}")
             profile = load_machine_profile(machine)
             ip_auto = False
             if not ip:
@@ -211,7 +249,7 @@ def main():
                     ip, ip_auto = api_ip, True
                 else:
                     die(
-                        f"Keine IP angegeben und Maschine nicht aktiv — bitte manuell: htb init {machine} <ip>"
+                        f"No IP provided and machine not active — specify manually: htb init {machine} <ip>"
                     )
             from .commands import init
 
@@ -226,14 +264,14 @@ def main():
         elif mode == "update":
             ip = next((a for a in extra if not a.startswith("--")), "")
             if ip and not re.fullmatch(r"(\d{1,3}\.){3}\d{1,3}", ip):
-                die(f"Ungültige IP-Adresse: {ip}")
+                die(f"Invalid IP address: {ip}")
             if not ip:
                 profile = load_machine_profile(machine)
                 if api_ip := profile.get("ip"):
                     ip = api_ip
                 else:
                     die(
-                        f"Keine IP angegeben und Maschine nicht aktiv — bitte manuell: htb update {machine} <ip>"
+                        f"No IP provided and machine not active — specify manually: htb update {machine} <ip>"
                     )
             from .commands import update
 
@@ -261,10 +299,25 @@ def main():
 
         elif mode == "scan":
             full = "--full" in extra
+            ports = next(
+                (
+                    extra[i + 1]
+                    for i, a in enumerate(extra)
+                    if a == "--ports" and i + 1 < len(extra)
+                ),
+                "",
+            )
             ip = next((a for a in extra if not a.startswith("--")), "")
             from .commands import scan
 
-            scan.run(machine, ip=ip, full=full)
+            scan.run(machine, ip=ip, full=full, ports=ports)
+
+        elif mode == "note":
+            if not extra:
+                die("Usage: htb note <machine> <text>")
+            from .commands import notes_add
+
+            notes_add.run(machine, " ".join(extra))
 
         elif mode == "creds":
             from .commands import creds

@@ -9,13 +9,13 @@ _DIFF_COLORS = {"Easy": "green", "Medium": "yellow", "Hard": "red", "Insane": "m
 def run():
     key = get_api_key()
     if not key:
-        die("Kein API-Key — htb key set")
+        die("No API key — run: htb key set")
 
-    header("Tracks / Lernpfade")
+    header("Tracks / Learning Paths")
     tracks = get_tracks(key)
 
     if not tracks:
-        warn("Keine Tracks gefunden oder API nicht verfügbar")
+        warn("No tracks found or API unavailable")
         return
 
     table = Table(show_header=True, header_style="bold cyan", border_style="dim")
@@ -33,6 +33,6 @@ def run():
             official,
         )
 
-    console.print(f"  {len(tracks)} Tracks\n")
+    console.print(f"  {len(tracks)} tracks\n")
     console.print(table)
     print()

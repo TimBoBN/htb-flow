@@ -5,12 +5,12 @@ from ..ui import console, die, header, warn
 def run():
     key = get_api_key()
     if not key:
-        die("Kein API-Key — htb key set")
+        die("No API key — run: htb key set")
 
-    header("Profil")
+    header("Profile")
     p = get_profile(key)
     if not p:
-        warn("Profil nicht verfügbar")
+        warn("Profile not available")
         return
 
     rank_colors = {
@@ -26,7 +26,7 @@ def run():
     color = rank_colors.get(rank, "white")
 
     console.print(f"  [bold]Name:[/bold]         {p.get('name', '?')}")
-    console.print(f"  [bold]Rang:[/bold]         [{color}]{rank}[/{color}]")
+    console.print(f"  [bold]Rank:[/bold]         [{color}]{rank}[/{color}]")
     console.print(f"  [bold]Punkte:[/bold]       {p.get('points', '?')}")
     console.print(f"  [bold]Ranking:[/bold]      #{p.get('ranking', '?')}")
     console.print(f"  [bold]User Owns:[/bold]    {p.get('user_owns', '?')}")
@@ -34,5 +34,5 @@ def run():
     console.print(f"  [bold]User Bloods:[/bold]  {p.get('user_bloods', '?')}")
     console.print(f"  [bold]Root Bloods:[/bold]  {p.get('system_bloods', '?')}")
     if p.get("country_name"):
-        console.print(f"  [bold]Land:[/bold]         {p['country_name']}")
+        console.print(f"  [bold]Country:[/bold]         {p['country_name']}")
     print()

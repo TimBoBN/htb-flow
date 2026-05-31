@@ -48,8 +48,8 @@ def die(msg: str) -> NoReturn:
 
 def ask(question: str) -> bool:
     try:
-        ans = input(f"  {question} [j/N] ")
-        return ans.strip().lower() == "j"
+        ans = input(f"  {question} [y/N] ")
+        return ans.strip().lower() == "y"
     except EOFError:
         print()
         return False

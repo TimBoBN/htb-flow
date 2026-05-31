@@ -10,7 +10,7 @@ from ..ui import ask_input, console, die, header, ok, warn
 def run(machine: str):
     notes_path = HTB_BASE / machine / "notes.md"
     if not notes_path.exists():
-        die(f"notes.md nicht gefunden: {notes_path}")
+        die(f"notes.md not found: {notes_path}")
 
     header(f"Shell: {machine}")
 
@@ -22,25 +22,25 @@ def run(machine: str):
         profile = load_machine_profile(machine)
         ip = profile.get("ip", "")
     if not ip:
-        die("Keine IP gefunden — htb update <machine> <ip>")
+        die("No IP found — run: htb update <machine> <ip>")
 
     creds = notes.parse_creds(notes_path)
 
-    # Cred auswählen
+    # Select credential
     if not creds:
-        warn("Keine Credentials in notes.md — verbinde ohne Passwort")
+        warn("No credentials in notes.md — connecting without password")
         cred = None
     elif len(creds) == 1:
         cred = creds[0]
     else:
-        console.print("\n  Gefundene Credentials:")
+        console.print("\n  Found credentials:")
         for i, c in enumerate(creds):
             console.print(f"    [{i + 1}] [{c['context']}] {c['user']}")
-        choice = ask_input(f"Welche? (1-{len(creds)}):")
+        choice = ask_input(f"Which one? (1-{len(creds)}):")
         try:
             cred = creds[int(choice) - 1]
         except (ValueError, IndexError):
-            die("Ungültige Auswahl")
+            die("Invalid selection")
 
     _connect(ip, os, cred)
 
@@ -71,15 +71,15 @@ def _connect_linux(ip: str, user: str, password: str | None):
         )
     else:
         if password:
-            warn(f"sshpass nicht installiert — Passwort: [bold]{password}[/bold]")
-            warn("Installieren: sudo pacman -S sshpass")
+            warn(f"sshpass not installed — password: [bold]{password}[/bold]")
+            warn("Install: sudo pacman -S sshpass")
         subprocess.run(["ssh", "-o", "StrictHostKeyChecking=no", f"{user}@{ip}"])
 
 
 def _connect_windows(ip: str, user: str, password: str | None):
     ok(f"evil-winrm → {user}@{ip}")
     if not shutil.which("evil-winrm"):
-        die("evil-winrm nicht gefunden\nInstallieren: gem install evil-winrm")
+        die("evil-winrm not found\nInstall: gem install evil-winrm")
     cmd = ["evil-winrm", "-i", ip, "-u", user]
     if password:
         cmd += ["-p", password]

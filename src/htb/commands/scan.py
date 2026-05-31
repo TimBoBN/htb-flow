@@ -5,27 +5,44 @@ from ..config import HTB_BASE
 from ..ui import console, die, header, ok
 
 
-def run(machine: str, ip: str = "", full: bool = False):
+def run(machine: str, ip: str = "", full: bool = False, ports: str = ""):
     box_dir = HTB_BASE / machine
     if not box_dir.exists():
-        die(f"Maschine '{machine}' nicht gefunden unter {box_dir}")
+        die(f"Machine '{machine}' not found at {box_dir}")
 
-    # IP aus notes.md wenn nicht angegeben
     if not ip:
         notes_path = box_dir / "notes.md"
         if notes_path.exists():
             n = notes.parse(notes_path)
             ip = n.get("ip", "")
     if not ip:
-        die("Keine IP — bitte angeben: htb scan <machine> <ip>")
+        die("No IP — please provide: htb scan <machine> <ip>")
 
     nmap_dir = box_dir / "nmap"
     nmap_dir.mkdir(exist_ok=True)
 
-    if full:
+    if ports:
+        header(f"Nmap Custom Scan: {machine}")
+        console.print(f"  Target: {ip}  Ports: {ports}\n")
+        subprocess.run(
+            [
+                "nmap",
+                "-sV",
+                "-sC",
+                "--open",
+                "-p",
+                ports,
+                "-oN",
+                str(nmap_dir / f"ports-{ports.replace(',', '_')}.txt"),
+                ip,
+            ],
+            check=False,
+        )
+        ok(f"Custom scan done → nmap/ports-{ports.replace(',', '_')}.txt")
+    elif full:
         header(f"Nmap Full Scan: {machine}")
-        console.print(f"  Ziel: {ip}")
-        console.print("  Full scan (alle Ports) läuft im Hintergrund...")
+        console.print(f"  Target: {ip}")
+        console.print("  Full scan (all ports) running in background...")
         proc = subprocess.Popen(
             ["nmap", "-p-", "--min-rate", "5000", "-oN", str(nmap_dir / "full.txt"), ip],
             stdout=subprocess.DEVNULL,
@@ -34,10 +51,10 @@ def run(machine: str, ip: str = "", full: bool = False):
         ok(f"Full scan PID {proc.pid} → nmap/full.txt")
     else:
         header(f"Nmap Quick Scan: {machine}")
-        console.print(f"  Ziel: {ip}\n")
+        console.print(f"  Target: {ip}\n")
         subprocess.run(
             ["nmap", "-sV", "-sC", "--open", "-oN", str(nmap_dir / "quick.txt"), ip],
             check=False,
         )
-        ok("Quick scan fertig → nmap/quick.txt")
+        ok("Quick scan done → nmap/quick.txt")
     print()

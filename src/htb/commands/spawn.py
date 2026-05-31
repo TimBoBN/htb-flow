@@ -7,31 +7,31 @@ from ..ui import die, header, ok, warn
 def run(machine: str):
     key = get_api_key()
     if not key:
-        die("Kein API-Key — HTB_API_KEY oder ~/.config/htb/api_key")
+        die("No API key — run: htb key set")
 
     header(f"Spawn: {machine}")
 
     profile = load_machine_profile(machine)
     machine_id = profile.get("id")
     if not machine_id:
-        die(f"Maschine '{machine}' nicht gefunden oder API nicht erreichbar")
+        die(f"Machine '{machine}' not found or API unreachable")
 
     msg = spawn_machine(key, machine_id)
     if msg:
         ok(msg)
     else:
-        warn("Keine Antwort von der API")
+        warn("No response from API")
         return
 
-    print("  Warte auf IP", end="", flush=True)
+    print("  Waiting for IP", end="", flush=True)
     for _ in range(30):
         time.sleep(1)
         print(".", end="", flush=True)
         active = get_active_machine(key)
         if active.get("ip"):
             print()
-            ok(f"Maschine aktiv: [cyan]{active['ip']}[/cyan]")
+            ok(f"Machine active: [cyan]{active["ip"]}[/cyan]")
             ok(f"Hostname: {machine.lower()}.htb")
             return
     print()
-    warn("IP noch nicht verfügbar — versuche: htb status")
+    warn("IP not yet available — try: htb status")

@@ -16,9 +16,15 @@ ALL_COMMANDS = (
     "tracks",
     "fortresses",
     "todo",
+    "stats",
+    "season",
+    "export",
+    "doctor",
+    "config",
     "vpn",
     "shell",
     "notes",
+    "note",
     "flag",
     "scan",
     "creds",
@@ -43,12 +49,12 @@ _htb() {
     fi
 
     case "$prev" in
-        list)
-            COMPREPLY=($(compgen -W "--retired --os --diff" -- "$cur")) ;;
-        scan)
-            COMPREPLY=($(compgen -W "--full" -- "$cur")) ;;
-        completion)
-            COMPREPLY=($(compgen -W "bash zsh" -- "$cur")) ;;
+        list)       COMPREPLY=($(compgen -W "--retired --os --diff --search" -- "$cur")) ;;
+        scan)       COMPREPLY=($(compgen -W "--full --ports" -- "$cur")) ;;
+        export)     COMPREPLY=($(compgen -W "--notes-only" -- "$cur")) ;;
+        completion) COMPREPLY=($(compgen -W "bash zsh" -- "$cur")) ;;
+        vpn)        COMPREPLY=($(compgen -W "status start stop switch" -- "$cur")) ;;
+        key)        COMPREPLY=($(compgen -W "set clear status" -- "$cur")) ;;
     esac
 }
 complete -F _htb htb
@@ -66,9 +72,12 @@ _htb() {
     fi
 
     case "${words[2]}" in
-        list)       _arguments '--retired[Retired Machines]' '--os[OS-Filter]:os:(Linux Windows)' '--diff[Difficulty-Filter]:diff:(Easy Medium Hard Insane)' ;;
-        scan)       _arguments '--full[Full scan]' '2:ip:' ;;
+        list)       _arguments '--retired[Retired machines]' '--os[OS filter]:os:(Linux Windows)' '--diff[Difficulty filter]:diff:(Easy Medium Hard Insane)' '--search[Search query]:query:' ;;
+        scan)       _arguments '--full[Full scan]' '--ports[Custom ports]:ports:' '2:ip:' ;;
+        export)     _arguments '--notes-only[Export notes only]' ;;
         completion) _arguments '2:shell:(bash zsh)' ;;
+        vpn)        _arguments '2:subcmd:(status start stop switch)' ;;
+        key)        _arguments '2:subcmd:(set clear status)' ;;
     esac
 }
 _htb "$@"
@@ -81,4 +90,4 @@ def run(shell: str):
     elif shell == "zsh":
         print(ZSH_SCRIPT)
     else:
-        die(f"Unbekannte Shell: {shell} (bash oder zsh)")
+        die(f"Unknown shell: {shell} (bash or zsh)")

@@ -7,19 +7,19 @@ from ..ui import console, die, header, warn
 def run(limit: int = 20):
     key = get_api_key()
     if not key:
-        die("Kein API-Key — htb key set")
+        die("No API key — run: htb key set")
 
-    header("Aktivität")
+    header("Activity")
     acts = get_activity(key)
     if not acts:
-        warn("Keine Aktivität gefunden")
+        warn("No activity found")
         return
 
     table = Table(show_header=True, header_style="bold cyan", border_style="dim")
-    table.add_column("Datum", min_width=12)
+    table.add_column("Date", min_width=12)
     table.add_column("Box", style="bold", min_width=14)
-    table.add_column("Typ", min_width=6)
-    table.add_column("Punkte", justify="right", min_width=6)
+    table.add_column("Type", min_width=6)
+    table.add_column("Points", justify="right", min_width=6)
     table.add_column("Blood", justify="center", min_width=5)
 
     for a in acts[:limit]:

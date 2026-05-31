@@ -8,8 +8,8 @@ def run(machine: str):
     header(f"Open: {machine}")
     try:
         subprocess.run(["xdg-open", url], check=True, capture_output=True)
-        ok(f"Browser geöffnet: {url}")
+        ok(f"Opened in browser: {url}")
     except Exception:
-        warn("Browser konnte nicht geöffnet werden")
+        warn("Could not open browser")
         console.print(f"  [cyan]{url}[/cyan]")
     print()

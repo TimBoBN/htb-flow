@@ -18,11 +18,11 @@ def get_ip() -> str:
 
 def start():
     if not HTB_OVPN.exists():
-        die(f"HTB.ovpn nicht gefunden unter {HTB_OVPN}")
+        die(f"HTB.ovpn not found at {HTB_OVPN}")
     subprocess.Popen(
         ["sudo", "openvpn", "--config", str(HTB_OVPN), "--daemon", "--log", "/tmp/htb-vpn.log"]  # nosec B108
     )
-    print("  Warte auf tun0", end="", flush=True)
+    print("  Waiting for tun0", end="", flush=True)
     for _ in range(15):
         time.sleep(1)
         print(".", end="", flush=True)
@@ -30,14 +30,14 @@ def start():
             break
     print()
     if not active():
-        die("VPN konnte nicht gestartet werden (Log: /tmp/htb-vpn.log)")
-    ok("VPN gestartet")
+        die("VPN could not be started (log: /tmp/htb-vpn.log)")
+    ok("VPN started")
 
 
 def stop():
     subprocess.run(["sudo", "pkill", "openvpn"], capture_output=True)
     time.sleep(1)
     if active():
-        warn("tun0 noch aktiv")
+        warn("tun0 still active")
     else:
-        ok("VPN gestoppt")
+        ok("VPN stopped")

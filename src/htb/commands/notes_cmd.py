@@ -22,7 +22,7 @@ def run(machine: str):
 
     try:
         subprocess.run(["xdg-open", str(notes_path)], check=True, capture_output=True)
-        ok(f"Geöffnet: {notes_path}")
+        ok(f"Opened: {notes_path}")
     except Exception:
         console.print(f"\n  [cyan]{notes_path}[/cyan]\n")
-        warn("Kein Editor konfiguriert — Pfad oben kopieren oder EDITOR setzen")
+        warn("No editor configured — copy the path above or set $EDITOR")

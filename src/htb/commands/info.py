@@ -8,7 +8,7 @@ def run(machine: str):
 
     profile = load_machine_profile(machine)
     if not profile:
-        warn("Maschine nicht gefunden oder API nicht erreichbar")
+        warn("Machine not found or API unreachable")
         return
 
     diff = profile.get("difficulty", "?")
@@ -16,20 +16,20 @@ def run(machine: str):
     color = diff_colors.get(diff, "white")
 
     console.print(f"  [bold]OS:[/bold]            {profile.get('os', '?')}")
-    console.print(f"  [bold]Schwierigkeit:[/bold] [{color}]{diff}[/{color}]")
-    console.print(f"  [bold]Punkte:[/bold]        {profile.get('points', '?')}")
+    console.print(f"  [bold]Difficulty:[/bold] [{color}]{diff}[/{color}]")
+    console.print(f"  [bold]Points:[/bold]        {profile.get('points', '?')}")
     console.print(f"  [bold]Release:[/bold]       {profile.get('release', '?')}")
     console.print(f"  [bold]Rating:[/bold]        ★ {profile.get('stars', '?')}")
 
     ip = profile.get("ip", "")
     if ip:
-        console.print(f"  [bold]Aktive IP:[/bold]     [cyan]{ip}[/cyan]")
+        console.print(f"  [bold]Active IP:[/bold]     [cyan]{ip}[/cyan]")
     else:
-        console.print("  [bold]Aktive IP:[/bold]     [dim]nicht aktiv[/dim]")
+        console.print("  [bold]Active IP:[/bold]     [dim]not active[/dim]")
 
     box_dir = HTB_BASE / machine
     if box_dir.exists():
-        console.print(f"  [bold]Lokal:[/bold]         [green]✔[/green] {box_dir}")
+        console.print(f"  [bold]Local:[/bold]         [green]✔[/green] {box_dir}")
     else:
-        console.print("  [bold]Lokal:[/bold]         [dim]nicht vorhanden[/dim]")
+        console.print("  [bold]Local:[/bold]         [dim]not present[/dim]")
     print()

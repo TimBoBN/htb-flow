@@ -14,7 +14,7 @@ def _check_401(r) -> bool:
     global _warned_auth
     if r.status_code == 401 and not _warned_auth:
         _warned_auth = True
-        print("\033[31m  ✘  API Key ungültig oder abgelaufen — htb key set\033[0m", file=sys.stderr)
+        print("\033[31m  ✘  API key invalid or expired — run: htb key set\033[0m", file=sys.stderr)
     return r.status_code == 401
 
 
@@ -23,17 +23,17 @@ KEYRING_USER = "api_key"
 
 
 def get_api_key() -> str | None:
-    # 1. Env var (CI / Skripte)
+    # 1. Env var (CI / scripts)
     if key := os.environ.get("HTB_API_KEY"):
         return key.strip()
-    # 2. System Keyring (verschlüsselt)
+    # 2. System keyring (encrypted)
     try:
         key = keyring.get_password(KEYRING_SERVICE, KEYRING_USER)
         if key:
             return key
     except Exception:
         pass
-    # 3. Fallback: Plaintext-Datei (Migration)
+    # 3. Fallback: plaintext file (legacy migration)
     if HTB_KEY_FILE.exists():
         return HTB_KEY_FILE.read_text().strip() or None
     return None
@@ -209,6 +209,20 @@ def get_fortresses(key: str) -> list[dict]:
         return r.json().get("data") or []
     except Exception:
         return []
+
+
+def get_season(key: str) -> dict:
+    """Returns the currently active season or empty dict."""
+    try:
+        r = requests.get(f"{HTB_API_BASE}/season/list", headers=_headers(key), timeout=8)
+        r.raise_for_status()
+        seasons = r.json().get("data") or []
+        for s in seasons:
+            if s.get("active"):
+                return s
+        return seasons[0] if seasons else {}
+    except Exception:
+        return {}
 
 
 def terminate_machine(key: str) -> str | None:

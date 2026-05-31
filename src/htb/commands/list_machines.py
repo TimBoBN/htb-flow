@@ -16,11 +16,11 @@ def _machine_table(machines: list[dict]) -> Table:
     table = Table(show_header=True, header_style="bold cyan", border_style="dim")
     table.add_column("Name", style="bold", min_width=12)
     table.add_column("OS", min_width=8)
-    table.add_column("Schwierigkeit", min_width=10)
-    table.add_column("Punkte", justify="right", min_width=6)
+    table.add_column("Difficulty", min_width=10)
+    table.add_column("Points", justify="right", min_width=6)
     table.add_column("Rating", min_width=6)
     table.add_column("Release", min_width=10)
-    table.add_column("Lokal", justify="center", min_width=5)
+    table.add_column("Local", justify="center", min_width=5)
 
     local_names = (
         {d.name.lower() for d in HTB_BASE.iterdir() if d.is_dir()} if HTB_BASE.exists() else set()
@@ -47,7 +47,7 @@ def _machine_table(machines: list[dict]) -> Table:
 def run(args: list[str]):
     key = get_api_key()
     if not key:
-        die("Kein API-Key — HTB_API_KEY oder ~/.config/htb/api_key")
+        die("No API key — run: htb key set")
 
     retired = "--retired" in args
     os_filter = None
@@ -62,7 +62,7 @@ def run(args: list[str]):
             search_query = args[i + 1]
 
     if search_query:
-        label = f"Suche: {search_query}"
+        label = f"Search: {search_query}"
     elif retired:
         label = "Retired Machines"
     else:
@@ -73,8 +73,9 @@ def run(args: list[str]):
         machines = search_machines(key, search_query)
     else:
         machines = list_machines(key, retired=retired)
+
     if not machines:
-        warn("Keine Maschinen gefunden oder API nicht erreichbar")
+        warn("No machines found or API unreachable")
         return
 
     if os_filter:
@@ -86,6 +87,6 @@ def run(args: list[str]):
             if diff_filter in (m.get("difficultyText") or m.get("difficulty") or "").lower()
         ]
 
-    console.print(f"  {len(machines)} Maschinen\n")
+    console.print(f"  {len(machines)} machine(s)\n")
     console.print(_machine_table(machines))
     print()
