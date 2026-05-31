@@ -1,6 +1,6 @@
 from .. import notes
 from ..config import HTB_BASE
-from ..ui import header, ok, die
+from ..ui import die, header, ok
 
 
 def run(machine: str, port: str, service: str, version: str = ""):

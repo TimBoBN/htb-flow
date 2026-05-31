@@ -1,5 +1,5 @@
 from ..api import get_api_key, get_profile
-from ..ui import console, header, warn, die
+from ..ui import console, die, header, warn
 
 
 def run():
@@ -14,11 +14,15 @@ def run():
         return
 
     rank_colors = {
-        "Noob": "dim", "Script Kiddie": "white", "Hacker": "cyan",
-        "Pro Hacker": "green", "Elite Hacker": "yellow",
-        "Guru": "magenta", "Omniscient": "bold red",
+        "Noob": "dim",
+        "Script Kiddie": "white",
+        "Hacker": "cyan",
+        "Pro Hacker": "green",
+        "Elite Hacker": "yellow",
+        "Guru": "magenta",
+        "Omniscient": "bold red",
     }
-    rank  = p.get("rank", "?")
+    rank = p.get("rank", "?")
     color = rank_colors.get(rank, "white")
 
     console.print(f"  [bold]Name:[/bold]         {p.get('name', '?')}")

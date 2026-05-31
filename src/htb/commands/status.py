@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 
-from ..api import get_api_key, get_active_machine
-from ..ui import console, header, ok, warn, die
+from ..api import get_active_machine, get_api_key
+from ..ui import console, die, header, ok
 
 
 def _time_remaining(expires_at: str) -> str:

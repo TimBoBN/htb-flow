@@ -4,11 +4,11 @@ from datetime import date
 
 from .. import hosts, notes, vpn
 from ..config import HTB_BASE
-from ..ui import console, header, ok, warn, BANNER_HTB
+from ..ui import BANNER_HTB, console, header, ok, warn
 
 
 def run(machine: str, ip: str, profile: dict, ip_auto: bool):
-    box_dir  = HTB_BASE / machine
+    box_dir = HTB_BASE / machine
     hostname = f"{machine.lower()}.htb"
 
     console.print(BANNER_HTB)
@@ -68,7 +68,9 @@ def run(machine: str, ip: str, profile: dict, ip_auto: bool):
     if not notes_path.exists():
         notes.create(
             notes_path,
-            machine=machine, ip=ip, hostname=hostname,
+            machine=machine,
+            ip=ip,
+            hostname=hostname,
             date=date.today().strftime("%d.%m.%Y"),
             os=profile.get("os", "?"),
             difficulty=profile.get("difficulty", "?"),
@@ -82,23 +84,22 @@ def run(machine: str, ip: str, profile: dict, ip_auto: bool):
     header("Nmap")
     console.print("  [bold][1/2][/bold] Quick scan (Top 1000 Ports)...")
     subprocess.run(
-        ["nmap", "-sV", "-sC", "--open", "-oN",
-         str(box_dir / "nmap/quick.txt"), ip],
+        ["nmap", "-sV", "-sC", "--open", "-oN", str(box_dir / "nmap/quick.txt"), ip],
         check=False,
     )
     ok("Quick scan fertig → nmap/quick.txt")
 
     console.print("\n  [bold][2/2][/bold] Full scan (alle Ports) läuft im Hintergrund...")
     proc = subprocess.Popen(
-        ["nmap", "-p-", "--min-rate", "5000", "-oN",
-         str(box_dir / "nmap/full.txt"), ip],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        ["nmap", "-p-", "--min-rate", "5000", "-oN", str(box_dir / "nmap/full.txt"), ip],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
     )
     ok(f"Full scan PID {proc.pid} → nmap/full.txt (läuft noch)")
 
-    console.print(f"\n[bold cyan]══════════════════════════════════[/bold cyan]")
+    console.print("\n[bold cyan]══════════════════════════════════[/bold cyan]")
     console.print("[bold]  Setup abgeschlossen[/bold]")
-    console.print(f"[bold cyan]══════════════════════════════════[/bold cyan]")
+    console.print("[bold cyan]══════════════════════════════════[/bold cyan]")
     console.print(f"  [bold]Arbeitsverzeichnis:[/bold] {box_dir}")
     console.print(f"  [bold]Hostname:[/bold]           {hostname}")
     console.print(f"  [bold]OS:[/bold]                 {profile.get('os', '?')}")
@@ -109,11 +110,12 @@ def run(machine: str, ip: str, profile: dict, ip_auto: bool):
     console.print(f"  [bold]Notes:[/bold]              {notes_path}")
     console.print(f"\n  [cyan]cd {box_dir}[/cyan]")
 
-    console.print(f"\n[bold cyan]══ Offene Ports (Quick Scan) ══[/bold cyan]")
+    console.print("\n[bold cyan]══ Offene Ports (Quick Scan) ══[/bold cyan]")
     quick = box_dir / "nmap/quick.txt"
     if quick.exists():
-        ports = [l for l in quick.read_text().splitlines()
-                 if re.match(r"^\d+/(tcp|udp)", l)]
+        ports = [
+            line for line in quick.read_text().splitlines() if re.match(r"^\d+/(tcp|udp)", line)
+        ]
         for p in ports:
             console.print(f"  {p}")
         if not ports:

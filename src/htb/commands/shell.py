@@ -2,9 +2,9 @@ import shutil
 import subprocess
 
 from .. import notes
-from ..api import get_api_key, load_machine_profile
+from ..api import load_machine_profile
 from ..config import HTB_BASE
-from ..ui import console, header, ok, warn, die, ask_input
+from ..ui import ask_input, console, die, header, ok, warn
 
 
 def run(machine: str):
@@ -14,9 +14,9 @@ def run(machine: str):
 
     header(f"Shell: {machine}")
 
-    n    = notes.parse(notes_path)
-    ip   = n.get("ip", "")
-    os   = n.get("os", "").lower()
+    n = notes.parse(notes_path)
+    ip = n.get("ip", "")
+    os = n.get("os", "").lower()
 
     if not ip:
         profile = load_machine_profile(machine)
@@ -46,7 +46,7 @@ def run(machine: str):
 
 
 def _connect(ip: str, os_name: str, cred: dict | None):
-    user     = cred["user"]     if cred else "root"
+    user = cred["user"] if cred else "root"
     password = cred["password"] if cred else None
 
     if "windows" in os_name:
@@ -58,11 +58,17 @@ def _connect(ip: str, os_name: str, cred: dict | None):
 def _connect_linux(ip: str, user: str, password: str | None):
     ok(f"SSH → {user}@{ip}")
     if password and shutil.which("sshpass"):
-        subprocess.run([
-            "sshpass", "-p", password,
-            "ssh", "-o", "StrictHostKeyChecking=no",
-            f"{user}@{ip}",
-        ])
+        subprocess.run(
+            [
+                "sshpass",
+                "-p",
+                password,
+                "ssh",
+                "-o",
+                "StrictHostKeyChecking=no",
+                f"{user}@{ip}",
+            ]
+        )
     else:
         if password:
             warn(f"sshpass nicht installiert — Passwort: [bold]{password}[/bold]")

@@ -1,7 +1,7 @@
 import time
 
-from ..api import get_api_key, load_machine_profile, spawn_machine, get_active_machine
-from ..ui import header, ok, warn, die
+from ..api import get_active_machine, get_api_key, load_machine_profile, spawn_machine
+from ..ui import die, header, ok, warn
 
 
 def run(machine: str):

@@ -2,7 +2,7 @@ import subprocess
 
 from .. import notes
 from ..config import HTB_BASE
-from ..ui import console, header, ok, warn, die
+from ..ui import console, die, header, ok
 
 
 def run(machine: str, ip: str = "", full: bool = False):
@@ -27,17 +27,16 @@ def run(machine: str, ip: str = "", full: bool = False):
         console.print(f"  Ziel: {ip}")
         console.print("  Full scan (alle Ports) läuft im Hintergrund...")
         proc = subprocess.Popen(
-            ["nmap", "-p-", "--min-rate", "5000", "-oN",
-             str(nmap_dir / "full.txt"), ip],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+            ["nmap", "-p-", "--min-rate", "5000", "-oN", str(nmap_dir / "full.txt"), ip],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
         ok(f"Full scan PID {proc.pid} → nmap/full.txt")
     else:
         header(f"Nmap Quick Scan: {machine}")
         console.print(f"  Ziel: {ip}\n")
         subprocess.run(
-            ["nmap", "-sV", "-sC", "--open", "-oN",
-             str(nmap_dir / "quick.txt"), ip],
+            ["nmap", "-sV", "-sC", "--open", "-oN", str(nmap_dir / "quick.txt"), ip],
             check=False,
         )
         ok("Quick scan fertig → nmap/quick.txt")

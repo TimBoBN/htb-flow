@@ -8,8 +8,9 @@ def _read() -> str:
 
 
 def _write(content: str):
-    subprocess.run(["sudo", "tee", "/etc/hosts"],
-                   input=content.encode(), check=True, capture_output=True)
+    subprocess.run(
+        ["sudo", "tee", "/etc/hosts"], input=content.encode(), check=True, capture_output=True
+    )
 
 
 def contains(hostname: str) -> bool:
@@ -25,13 +26,16 @@ def get_ip(hostname: str) -> str | None:
 
 
 def add(ip: str, hostname: str):
-    subprocess.run(["sudo", "tee", "-a", "/etc/hosts"],
-                   input=f"{ip}    {hostname}\n".encode(),
-                   check=True, capture_output=True)
+    subprocess.run(
+        ["sudo", "tee", "-a", "/etc/hosts"],
+        input=f"{ip}    {hostname}\n".encode(),
+        check=True,
+        capture_output=True,
+    )
 
 
 def remove(hostname: str):
-    lines = [l for l in _read().splitlines(keepends=True) if hostname not in l]
+    lines = [line for line in _read().splitlines(keepends=True) if hostname not in line]
     _write("".join(lines))
 
 
@@ -39,6 +43,7 @@ def update_ip(old_ip: str, new_ip: str, hostname: str):
     content = re.sub(
         rf"^{re.escape(old_ip)}\s[^\n]*{re.escape(hostname)}",
         f"{new_ip}    {hostname}",
-        _read(), flags=re.MULTILINE,
+        _read(),
+        flags=re.MULTILINE,
     )
     _write(content)

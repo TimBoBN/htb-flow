@@ -1,11 +1,12 @@
 import getpass
 import os
+
 import keyring
 import keyring.errors
 
 from ..api import KEYRING_SERVICE, KEYRING_USER
 from ..config import HTB_KEY_FILE
-from ..ui import console, header, ok, warn, die, ask
+from ..ui import ask, console, die, header, ok, warn
 
 
 def run(subcmd: str):

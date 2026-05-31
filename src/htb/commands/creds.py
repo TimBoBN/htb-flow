@@ -1,6 +1,6 @@
 from .. import notes
 from ..config import HTB_BASE
-from ..ui import header, ok, warn, die, ask_input
+from ..ui import ask_input, die, header, ok, warn
 
 
 def run(machine: str):
@@ -10,12 +10,12 @@ def run(machine: str):
 
     header(f"Credentials: {machine}")
 
-    user    = ask_input("Username:")
+    user = ask_input("Username:")
     if not user:
         warn("Abgebrochen")
         return
     password = ask_input("Passwort:")
-    context  = ask_input("Kontext (z.B. SSH, Web, leer = -):")
+    context = ask_input("Kontext (z.B. SSH, Web, leer = -):")
 
     notes.append_creds(notes_path, user, password, context)
     ok(f"Gespeichert: {context or '-'} | {user} | ***")

@@ -25,11 +25,11 @@ def run(machine: str):
     if ip:
         console.print(f"  [bold]Aktive IP:[/bold]     [cyan]{ip}[/cyan]")
     else:
-        console.print(f"  [bold]Aktive IP:[/bold]     [dim]nicht aktiv[/dim]")
+        console.print("  [bold]Aktive IP:[/bold]     [dim]nicht aktiv[/dim]")
 
     box_dir = HTB_BASE / machine
     if box_dir.exists():
         console.print(f"  [bold]Lokal:[/bold]         [green]✔[/green] {box_dir}")
     else:
-        console.print(f"  [bold]Lokal:[/bold]         [dim]nicht vorhanden[/dim]")
+        console.print("  [bold]Lokal:[/bold]         [dim]nicht vorhanden[/dim]")
     print()

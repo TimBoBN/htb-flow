@@ -1,11 +1,19 @@
-import sys
 from ..ui import die
 
 ALL_COMMANDS = (
-    "init", "done", "update",
-    "status", "list", "search", "info",
-    "spawn", "reset",
-    "notes", "flag", "scan", "creds",
+    "init",
+    "done",
+    "update",
+    "status",
+    "list",
+    "search",
+    "info",
+    "spawn",
+    "reset",
+    "notes",
+    "flag",
+    "scan",
+    "creds",
     "completion",
 )
 

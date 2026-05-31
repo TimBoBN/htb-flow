@@ -1,5 +1,5 @@
 from ..api import get_api_key, load_machine_profile, reset_machine
-from ..ui import header, ok, warn, die
+from ..ui import die, header, ok, warn
 
 
 def run(machine: str):

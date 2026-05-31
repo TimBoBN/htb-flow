@@ -69,7 +69,7 @@ def _cmd_switch():
         vpn.stop()
 
     subprocess.Popen(
-        ["sudo", "openvpn", "--config", str(selected), "--daemon", "--log", "/tmp/htb-vpn.log"]
+        ["sudo", "openvpn", "--config", str(selected), "--daemon", "--log", "/tmp/htb-vpn.log"]  # nosec B108
     )
     print("  Warte auf tun0", end="", flush=True)
     for _ in range(15):

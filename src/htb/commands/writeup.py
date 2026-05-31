@@ -1,8 +1,7 @@
 import re
-from pathlib import Path
 
 from ..config import HTB_BASE
-from ..ui import console, header, ok, warn, die
+from ..ui import console, die, header, ok
 
 
 def _clean(text: str) -> str:
@@ -13,9 +12,7 @@ def _clean(text: str) -> str:
     while i < len(lines):
         line = lines[i]
         # Skip empty table rows like "|      |         |         |"
-        if re.match(r"^\|\s*\|", line) and all(
-            c in " |\t" for c in line.rstrip("\n")
-        ):
+        if re.match(r"^\|\s*\|", line) and all(c in " |\t" for c in line.rstrip("\n")):
             i += 1
             continue
         out.append(line)
@@ -40,7 +37,7 @@ def run(machine: str):
 
     header(f"Writeup: {machine}")
     out_path = HTB_BASE / machine / f"{machine}-writeup.md"
-    cleaned  = _clean(notes_path.read_text())
+    cleaned = _clean(notes_path.read_text())
     out_path.write_text(cleaned)
     ok(f"Erstellt: {out_path}")
     console.print(f"\n  [cyan]{out_path}[/cyan]")

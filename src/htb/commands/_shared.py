@@ -1,6 +1,7 @@
 import re
+
 from ..api import submit_flag
-from ..ui import console, ok, warn, ask, ask_input
+from ..ui import ask, ask_input, console, ok, warn
 
 
 def submit_one(key: str, machine_id: int, label: str, flag: str) -> bool:

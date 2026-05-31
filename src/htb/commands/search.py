@@ -1,5 +1,5 @@
 from ..api import get_api_key, search_machines
-from ..ui import console, header, warn, die
+from ..ui import console, die, header, warn
 from .list_machines import _machine_table
 
 
