@@ -3,13 +3,13 @@ from datetime import date
 
 from .. import hosts
 from ..config import HTB_BASE
-from ..ui import console, header, ok, warn, die, BANNER_HTB
+from ..ui import BANNER_HTB, console, die, header, ok
 
 
 def run(machine: str, ip: str):
-    box_dir  = HTB_BASE / machine
+    box_dir = HTB_BASE / machine
     hostname = f"{machine.lower()}.htb"
-    notes    = box_dir / "notes.md"
+    notes = box_dir / "notes.md"
 
     if not box_dir.exists():
         die(f"Maschine '{machine}' nicht gefunden unter {box_dir}")
@@ -17,12 +17,12 @@ def run(machine: str, ip: str):
     console.print(BANNER_HTB)
     console.print(f"  [bold]Machine:[/bold]  {machine}")
     console.print(f"  [bold]IP:[/bold]       {ip}")
-    console.print(f"  [bold]Modus:[/bold]    [yellow]IP-Update[/yellow]")
+    console.print("  [bold]Modus:[/bold]    [yellow]IP-Update[/yellow]")
     console.print(f"  [bold]Zeit:[/bold]     {date.today().strftime('%d.%m.%Y')}\n")
 
     header("/etc/hosts")
     if hosts.contains(hostname):
-        old_ip = hosts.get_ip(hostname)
+        old_ip = hosts.get_ip(hostname) or ""
         if old_ip == ip:
             ok(f"IP ist bereits {ip} — nichts zu tun")
         else:
@@ -42,9 +42,9 @@ def run(machine: str, ip: str):
         else:
             ok("notes.md bereits aktuell")
 
-    console.print(f"\n[bold cyan]══════════════════════════════════[/bold cyan]")
+    console.print("\n[bold cyan]══════════════════════════════════[/bold cyan]")
     console.print("[bold]  Update abgeschlossen[/bold]")
-    console.print(f"[bold cyan]══════════════════════════════════[/bold cyan]")
+    console.print("[bold cyan]══════════════════════════════════[/bold cyan]")
     console.print(f"  [bold]Maschine:[/bold]  {machine}")
     console.print(f"  [bold]Neue IP:[/bold]   {ip}")
     console.print(f"  [bold]Hostname:[/bold]  {hostname}\n")

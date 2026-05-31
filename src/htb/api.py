@@ -1,10 +1,25 @@
 import os
+import sys
+
 import keyring
 import requests
+
 from .config import HTB_API_BASE, HTB_KEY_FILE
 
+_warned_auth = False
+
+
+def _check_401(r) -> bool:
+    """Prints a one-time warning on 401 and returns True if auth failed."""
+    global _warned_auth
+    if r.status_code == 401 and not _warned_auth:
+        _warned_auth = True
+        print("\033[31m  ✘  API Key ungültig oder abgelaufen — htb key set\033[0m", file=sys.stderr)
+    return r.status_code == 401
+
+
 KEYRING_SERVICE = "htbflow"
-KEYRING_USER    = "api_key"
+KEYRING_USER = "api_key"
 
 
 def get_api_key() -> str | None:
@@ -47,13 +62,13 @@ def load_machine_profile(machine: str) -> dict:
         info = r.json().get("info") or {}
         pts = info.get("static_points") or info.get("points")
         return {
-            "id":         info.get("id"),
-            "ip":         info.get("ip") or "",
-            "os":         info.get("os") or "?",
+            "id": info.get("id"),
+            "ip": info.get("ip") or "",
+            "os": info.get("os") or "?",
             "difficulty": info.get("difficultyText") or "?",
-            "points":     str(pts) if pts else "?",
-            "release":    (info.get("release") or "?")[:10],
-            "stars":      str(info.get("stars")) if info.get("stars") else "?",
+            "points": str(pts) if pts else "?",
+            "release": (info.get("release") or "?")[:10],
+            "stars": str(info.get("stars")) if info.get("stars") else "?",
         }
     except Exception:
         return {}
@@ -101,7 +116,7 @@ def reset_machine(key: str, machine_id: int) -> str | None:
 
 def list_machines(key: str, retired: bool = False) -> list[dict]:
     """Fetches all machines via pagination."""
-    machines = []
+    machines: list[dict] = []
     page = 1
     try:
         while True:
@@ -138,8 +153,7 @@ def search_machines(key: str, query: str) -> list[dict]:
 
 def get_user_id(key: str) -> int | None:
     try:
-        r = requests.get(f"{HTB_API_BASE}/user/info",
-                         headers=_headers(key), timeout=8)
+        r = requests.get(f"{HTB_API_BASE}/user/info", headers=_headers(key), timeout=8)
         r.raise_for_status()
         return r.json().get("info", {}).get("id")
     except Exception:
@@ -151,8 +165,7 @@ def get_profile(key: str) -> dict:
     if not uid:
         return {}
     try:
-        r = requests.get(f"{HTB_API_BASE}/profile/{uid}",
-                         headers=_headers(key), timeout=8)
+        r = requests.get(f"{HTB_API_BASE}/profile/{uid}", headers=_headers(key), timeout=8)
         r.raise_for_status()
         return r.json().get("profile") or {}
     except Exception:
@@ -164,10 +177,36 @@ def get_activity(key: str) -> list[dict]:
     if not uid:
         return []
     try:
-        r = requests.get(f"{HTB_API_BASE}/user/profile/activity/{uid}",
-                         headers=_headers(key), timeout=8)
+        r = requests.get(
+            f"{HTB_API_BASE}/user/profile/activity/{uid}", headers=_headers(key), timeout=8
+        )
+        if _check_401(r):
+            return []
         r.raise_for_status()
         return r.json().get("profile", {}).get("activity") or []
+    except Exception:
+        return []
+
+
+def get_tracks(key: str) -> list[dict]:
+    try:
+        r = requests.get(f"{HTB_API_BASE}/tracks", headers=_headers(key), timeout=8)
+        if _check_401(r):
+            return []
+        r.raise_for_status()
+        data = r.json()
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def get_fortresses(key: str) -> list[dict]:
+    try:
+        r = requests.get(f"{HTB_API_BASE}/fortresses", headers=_headers(key), timeout=8)
+        if _check_401(r):
+            return []
+        r.raise_for_status()
+        return r.json().get("data") or []
     except Exception:
         return []
 

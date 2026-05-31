@@ -1,5 +1,8 @@
 # htbflow
 
+[![CI](https://github.com/TimBoBN/htb-flow/actions/workflows/ci.yml/badge.svg)](https://github.com/TimBoBN/htb-flow/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/TimBoBN/htb-flow/branch/main/graph/badge.svg)](https://codecov.io/gh/TimBoBN/htb-flow)
+
 A command-line workflow tool for HackTheBox. Manage the full machine lifecycle from initial setup to completion: spawn machines, run recon, track credentials, submit flags, and archive finished boxes — all without leaving the terminal.
 
 ## Installation

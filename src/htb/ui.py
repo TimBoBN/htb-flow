@@ -1,7 +1,10 @@
 import sys
+from typing import NoReturn
+
 from rich.console import Console
 
 console = Console()
+_err_console = Console(stderr=True)
 
 BANNER_HTB = (
     "[bold red]"
@@ -29,15 +32,19 @@ BANNER_DONE = (
 def header(title: str):
     console.print(f"\n[bold cyan]══ {title} ══[/bold cyan]")
 
+
 def ok(msg: str):
     console.print(f"  [green]✔[/green]  {msg}")
+
 
 def warn(msg: str):
     console.print(f"  [yellow]⚠[/yellow]  {msg}")
 
-def die(msg: str):
-    console.print(f"  [red]✘[/red]  {msg}", stderr=True)
+
+def die(msg: str) -> NoReturn:
+    _err_console.print(f"  [red]✘[/red]  {msg}")
     sys.exit(1)
+
 
 def ask(question: str) -> bool:
     try:
@@ -49,6 +56,7 @@ def ask(question: str) -> bool:
     except KeyboardInterrupt:
         print()
         sys.exit(0)
+
 
 def ask_input(prompt: str) -> str:
     try:

@@ -1,15 +1,42 @@
+import os
 import re
 import sys
 
+from . import __version__
 from .api import load_machine_profile
 from .ui import console, die
-from . import __version__
 
-GLOBAL_CMDS  = {"status", "list", "search", "completion", "key",
-                "todo", "profile", "activity"}
-MACHINE_CMDS = {"init", "done", "update", "info", "notes",
-                "flag", "scan", "creds", "spawn", "reset",
-                "shell", "port", "writeup"}
+GLOBAL_CMDS = {
+    "status",
+    "list",
+    "search",
+    "completion",
+    "key",
+    "todo",
+    "profile",
+    "activity",
+    "timeline",
+    "tracks",
+    "fortresses",
+    "vpn",
+}
+MACHINE_CMDS = {
+    "init",
+    "done",
+    "update",
+    "info",
+    "notes",
+    "flag",
+    "scan",
+    "creds",
+    "spawn",
+    "reset",
+    "shell",
+    "port",
+    "writeup",
+    "open",
+    "diff",
+}
 ALL_CMDS = GLOBAL_CMDS | MACHINE_CMDS
 
 
@@ -34,18 +61,24 @@ def usage(exit_code: int = 1):
     console.print("  htb notes  <machine>               notes.md im Editor öffnen")
     console.print("  htb flag   <machine>               Flag einreichen")
     console.print("  htb scan   <machine> \\[ip] \\[--full]  Nmap erneut ausführen")
-    console.print("  htb creds  <machine>               Credentials speichern")
-    console.print("  htb shell  <machine>               Shell mit Creds aus notes.md")
-    console.print("  htb port   <machine> <port> <svc>  Port zur notes.md hinzufügen")
+    console.print("  htb creds   <machine>              Credentials speichern")
+    console.print("  htb shell   <machine>              Shell mit Creds aus notes.md")
+    console.print("  htb port    <machine> <port> <svc> Port zur notes.md hinzufügen")
     console.print("  htb writeup <machine>              Sauberes Writeup exportieren")
+    console.print("  htb open    <machine>              Im Browser öffnen")
+    console.print("  htb diff    <machine>              notes.md git diff")
     console.print("")
     console.print("[bold]Shell:[/bold]")
     console.print("  htb completion bash|zsh            Shell-Completion ausgeben")
     console.print("")
-    console.print("[bold]Profil:[/bold]")
+    console.print("[bold]Profil & Stats:[/bold]")
     console.print("  htb profile                        Eigenes Profil anzeigen")
-    console.print("  htb activity                       Letzte Aktivität")
+    console.print("  htb activity \\[n]                  Letzte n Aktivitäten (default 20)")
     console.print("  htb todo                           Laufende Boxen mit Flag-Status")
+    console.print("  htb timeline                       Solve-History als Chart")
+    console.print("  htb tracks                         Lernpfade anzeigen")
+    console.print("  htb fortresses                     Fortresses anzeigen")
+    console.print("  htb vpn [status|start|stop|switch] VPN verwalten")
     console.print("")
     console.print("[bold]Auth:[/bold]")
     console.print("  htb key set                        API Key im Keyring speichern")
@@ -63,7 +96,25 @@ def main():
         usage(0)
 
     if argv[0] in ("-v", "--version"):
-        console.print(f"htb v{__version__}")
+        try:
+            import keyring as _kr
+
+            from .config import HTB_KEY_FILE as _kf
+
+            key_source = (
+                "env"
+                if os.environ.get("HTB_API_KEY")
+                else "keyring"
+                if _kr.get_password("htbflow", "api_key")
+                else "file"
+                if _kf.exists()
+                else "none"
+            )
+        except Exception:
+            key_source = "?"
+        import sys as _sys
+
+        console.print(f"htb v{__version__}  Python {_sys.version.split()[0]}  Key: {key_source}")
         sys.exit(0)
 
     if argv[0] in ("-u", "--update"):
@@ -78,47 +129,76 @@ def main():
     # ── Global Commands ────────────────────────────────────────────────────────
     if mode == "status":
         from .commands import status
+
         status.run()
 
     elif mode == "list":
         from .commands import list_machines
+
         list_machines.run(rest)
 
     elif mode == "search":
         if not rest:
             die("Usage: htb search <query>")
         from .commands import search
+
         search.run(" ".join(rest))
 
     elif mode == "completion":
         shell = rest[0] if rest else "bash"
         from .commands import completion
+
         completion.run(shell)
 
     elif mode == "key":
         subcmd = rest[0] if rest else "status"
         from .commands import key_cmd
+
         key_cmd.run(subcmd)
 
     elif mode == "todo":
         from .commands import todo
+
         todo.run()
 
     elif mode == "profile":
         from .commands import profile
+
         profile.run()
 
     elif mode == "activity":
         limit = int(rest[0]) if rest and rest[0].isdigit() else 20
         from .commands import activity
+
         activity.run(limit)
+
+    elif mode == "timeline":
+        from .commands import timeline
+
+        timeline.run()
+
+    elif mode == "tracks":
+        from .commands import tracks
+
+        tracks.run()
+
+    elif mode == "fortresses":
+        from .commands import fortresses
+
+        fortresses.run()
+
+    elif mode == "vpn":
+        subcmd = rest[0] if rest else "status"
+        from .commands import vpn_cmd
+
+        vpn_cmd.run(subcmd)
 
     # ── Machine Commands ───────────────────────────────────────────────────────
     else:
         if not rest:
             die(f"Usage: htb {mode} <machine>")
         machine = rest[0]
-        extra   = rest[1:]
+        extra = rest[1:]
 
         if mode == "init":
             ip = next((a for a in extra if not a.startswith("--")), "")
@@ -130,13 +210,17 @@ def main():
                 if api_ip := profile.get("ip"):
                     ip, ip_auto = api_ip, True
                 else:
-                    die(f"Keine IP angegeben und Maschine nicht aktiv — bitte manuell: htb init {machine} <ip>")
+                    die(
+                        f"Keine IP angegeben und Maschine nicht aktiv — bitte manuell: htb init {machine} <ip>"
+                    )
             from .commands import init
+
             init.run(machine, ip, profile, ip_auto)
 
         elif mode == "done":
             profile = load_machine_profile(machine)
             from .commands import done
+
             done.run(machine, profile)
 
         elif mode == "update":
@@ -148,60 +232,84 @@ def main():
                 if api_ip := profile.get("ip"):
                     ip = api_ip
                 else:
-                    die(f"Keine IP angegeben und Maschine nicht aktiv — bitte manuell: htb update {machine} <ip>")
+                    die(
+                        f"Keine IP angegeben und Maschine nicht aktiv — bitte manuell: htb update {machine} <ip>"
+                    )
             from .commands import update
+
             update.run(machine, ip)
 
         elif mode == "info":
             from .commands import info
+
             info.run(machine)
 
         elif mode == "status":
             from .commands import status
+
             status.run()
 
         elif mode == "notes":
             from .commands import notes_cmd
+
             notes_cmd.run(machine)
 
         elif mode == "flag":
             from .commands import flag
+
             flag.run(machine)
 
         elif mode == "scan":
             full = "--full" in extra
-            ip   = next((a for a in extra if not a.startswith("--")), "")
+            ip = next((a for a in extra if not a.startswith("--")), "")
             from .commands import scan
+
             scan.run(machine, ip=ip, full=full)
 
         elif mode == "creds":
             from .commands import creds
+
             creds.run(machine)
 
         elif mode == "spawn":
             from .commands import spawn
+
             spawn.run(machine)
 
         elif mode == "reset":
             from .commands import reset
+
             reset.run(machine)
 
         elif mode == "shell":
             from .commands import shell
+
             shell.run(machine)
 
         elif mode == "port":
             if len(extra) < 2:
                 die("Usage: htb port <machine> <port> <service> [version]")
             port_num = extra[0]
-            service  = extra[1]
-            version  = extra[2] if len(extra) > 2 else ""
+            service = extra[1]
+            version = extra[2] if len(extra) > 2 else ""
             from .commands import port
+
             port.run(machine, port_num, service, version)
 
         elif mode == "writeup":
             from .commands import writeup
+
             writeup.run(machine)
+
+        elif mode == "open":
+            from .commands import open_machine
+
+            open_machine.run(machine)
+
+        elif mode == "diff":
+            from .commands import diff
+
+            diff.run(machine)
 
 
 if __name__ == "__main__":
