@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "htb-flow"
-version = "0.1.6"
+version = "0.1.6.1"
 description = "A command-line workflow tool for HackTheBox — manage the full machine lifecycle without leaving the terminal."
 readme = "README.md"
 license = { text = "MIT" }
