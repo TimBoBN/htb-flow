@@ -7,7 +7,7 @@ A command-line workflow tool for HackTheBox. Manage the full machine lifecycle f
 **Requirements:** Python 3.11+, `pipx`, `nmap`
 
 ```bash
-git clone https://github.com/timbobn/htbflow
+git clone https://github.com/timbobn/htb-flow
 cd htbflow
 pipx install .
 ```
