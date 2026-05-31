@@ -1,0 +1,58 @@
+import sys
+from rich.console import Console
+
+console = Console()
+
+BANNER_HTB = (
+    "[bold red]"
+    "\n  ██╗  ██╗████████╗██████╗ "
+    "\n  ██║  ██║╚══██╔══╝██╔══██╗"
+    "\n  ███████║   ██║   ██████╔╝"
+    "\n  ██╔══██║   ██║   ██╔══██╗"
+    "\n  ██║  ██║   ██║   ██████╔╝"
+    "\n  ╚═╝  ╚═╝   ╚═╝   ╚═════╝ "
+    "\n[/bold red]"
+)
+
+BANNER_DONE = (
+    "[bold red]"
+    "\n  ██████╗  ██████╗ ███╗   ██╗███████╗"
+    "\n  ██╔══██╗██╔═══██╗████╗  ██║██╔════╝"
+    "\n  ██║  ██║██║   ██║██╔██╗ ██║█████╗  "
+    "\n  ██║  ██║██║   ██║██║╚██╗██║██╔══╝  "
+    "\n  ██████╔╝╚██████╔╝██║ ╚████║███████╗"
+    "\n  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚══════╝"
+    "\n[/bold red]"
+)
+
+
+def header(title: str):
+    console.print(f"\n[bold cyan]══ {title} ══[/bold cyan]")
+
+def ok(msg: str):
+    console.print(f"  [green]✔[/green]  {msg}")
+
+def warn(msg: str):
+    console.print(f"  [yellow]⚠[/yellow]  {msg}")
+
+def die(msg: str):
+    console.print(f"  [red]✘[/red]  {msg}", stderr=True)
+    sys.exit(1)
+
+def ask(question: str) -> bool:
+    try:
+        ans = input(f"  {question} [j/N] ")
+        return ans.strip().lower() == "j"
+    except EOFError:
+        print()
+        return False
+    except KeyboardInterrupt:
+        print()
+        sys.exit(0)
+
+def ask_input(prompt: str) -> str:
+    try:
+        return input(f"  {prompt} ").strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        sys.exit(0)
