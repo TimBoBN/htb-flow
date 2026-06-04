@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import time
 
 from . import __version__
 from .api import load_machine_profile
@@ -248,9 +249,38 @@ def main():
                 if api_ip := profile.get("ip"):
                     ip, ip_auto = api_ip, True
                 else:
-                    die(
-                        f"No IP provided and machine not active — specify manually: htb init {machine} <ip>"
-                    )
+                    machine_id = profile.get("id")
+                    if not machine_id:
+                        die(
+                            f"Machine '{machine}' not found — check name or specify IP manually: htb init {machine} <ip>"
+                        )
+                    from .api import get_active_machine, get_api_key, spawn_machine
+                    from .ui import ask
+
+                    if ask("Machine not active — spawn it now?"):
+                        key = get_api_key()
+                        if not key:
+                            die("No API key — run: htb key set")
+                        msg = spawn_machine(key, machine_id)
+                        if msg:
+                            console.print(f"  {msg}")
+                        print("  Waiting for IP", end="", flush=True)
+                        for _ in range(30):
+                            time.sleep(1)
+                            print(".", end="", flush=True)
+                            active = get_active_machine(key)
+                            if ip_addr := active.get("ip"):
+                                print()
+                                ip, ip_auto = ip_addr, True
+                                profile["ip"] = ip
+                                break
+                        else:
+                            print()
+                            die("IP not available after 30s — try: htb status")
+                    else:
+                        die(
+                            f"No IP provided and machine not active — specify manually: htb init {machine} <ip>"
+                        )
             from .commands import init
 
             init.run(machine, ip, profile, ip_auto)
